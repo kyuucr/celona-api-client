@@ -30,12 +30,12 @@ def run_server():
     Starts a simple HTTP server in a separate thread.
     """
     # Use a TCP server to handle requests from the specified port
-    with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+    with socketserver.TCPServer(("0.0.0.0", PORT), MyHandler) as httpd:
         logging.info(f"[{datetime.now()}] Server thread started.")
         logging.info(
             f"[{datetime.now()}] Serving directory: "
             f"{os.path.abspath(SCRIPT_DIR)}")
-        print(f"HTTP Server serving at http://localhost:{PORT}")
+        print(f"HTTP Server serving at http://0.0.0.0:{PORT}")
         # serve_forever() is a blocking call, which is why we need a thread
         httpd.serve_forever()
 
