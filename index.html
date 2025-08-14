@@ -150,7 +150,6 @@
             return response.json();
         })
         .then(function (data) {
-            console.log(data)
             const span = document.querySelector("#lastUpdate");
             span.innerHTML = `${new Date(data.timestamp)}`
             appendData(data.enodebs);
