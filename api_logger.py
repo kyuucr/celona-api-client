@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 import json
 import logging
 from pathlib import Path
@@ -19,28 +19,35 @@ def get_call(url: str, headers: dict = None):
     Returns:
         dict or None: JSON response data if successful, None otherwise.
     """
-    logging.info(f"Attempting GET request to: {url}")
+    logging.info(
+        f"[{datetime.now()}] Attempting GET request to: {url}")
     try:
         response = requests.get(url, headers=headers, timeout=10) # 10-second timeout
         response.raise_for_status()  # Raises an HTTPError for bad responses (4xx or 5xx)
 
-        logging.info(f"Request successful! Status Code: {response.status_code}")
+        logging.info(
+            f"[{datetime.now()}] Request successful! "
+            f"Status Code: {response.status_code}")
         # Assuming the response is JSON, parse it
         json_data = response.json()
-        logging.debug("Response Data:")
+        logging.debug(f"[{datetime.now()}] Response Data:")
         logging.debug(json_data)
         return json_data
 
     except requests.exceptions.HTTPError as http_err:
-        logging.error(f"HTTP error occurred: {http_err}")
+        logging.error(f"[{datetime.now()}] HTTP error occurred: {http_err}")
     except requests.exceptions.ConnectionError as conn_err:
-        logging.error(f"Connection error occurred: {conn_err}")
+        logging.error(
+            f"[{datetime.now()}] Connection error occurred: {conn_err}")
     except requests.exceptions.Timeout as timeout_err:
-        logging.error(f"Timeout error occurred: {timeout_err}")
+        logging.error(
+            f"[{datetime.now()}] Timeout error occurred: {timeout_err}")
     except requests.exceptions.RequestException as req_err:
-        logging.error(f"An unexpected request error occurred: {req_err}")
+        logging.error(
+            f"[{datetime.now()}] An unexpected request error "
+            f"occurred: {req_err}")
     except ValueError:
-        logging.error(f"Response was not valid JSON.")
+        logging.error(f"[{datetime.now()}] Response was not valid JSON.")
     return None
 
 
@@ -57,19 +64,19 @@ def batch_fetch_data(api_key, log_dir):
         'devices': None
     }
 
-    logging.info('Fetching eNodeBs...')
+    logging.info(f"[{datetime.now()}] Fetching eNodeBs...")
     result = get_call(base_url + 'cfgm/enodebs', headers)
     if (result['success']):
         output['enodebs'] = result['data']
     time.sleep(1)   # Avoid rate limit
 
-    logging.info('Fetching devices...')
+    logging.info(f"[{datetime.now()}] Fetching devices...")
     result = get_call(base_url + 'cfgm/devices?config-status=Activated',
                       headers)
     if (result['success']):
         output['devices'] = result['data']
 
-    logging.info('Writing to logdir...')
+    logging.info(f"[{datetime.now()}] Writing to logdir ...")
     output_fn = log_dir / f"{timestamp}.json"
     with open(output_fn, 'w') as f:
         f.write(json.dumps(output))
@@ -105,14 +112,20 @@ if __name__ == '__main__':
             with open(args.api_key, 'r') as f:
                 api_key = f.read()
             batch_fetch_data(api_key, args.log_dir)
+            dt_target = (datetime.now(timezone.utc).astimezone() + timedelta(
+                0, args.interval)).isoformat()
+            logging.info(
+                f"[{datetime.now()}] Sleeping for {args.interval} minutes, "
+                f"waking up at {dt_target}")
+            time.sleep(args.interval * 60)
         except KeyboardInterrupt:
-            print('Script interrupted by user (Ctrl+C). Exiting.')
+            print("\nScript interrupted by user (Ctrl+C). Exiting.")
             break
         except FileNotFoundError:
             logging.error(
-                f"Please define API key in the {args.api_key.name} file !")
+                f"[{datetime.now()}] Please define API key in the "
+                f"{args.api_key.name} file !")
         except Exception as e:
-            logging.error(f"An unhandled error occurred in the main loop: {e}")
-        finally:
-            logging.info(f"Sleeping for {args.interval} minutes...")
-            time.sleep(args.interval * 60)
+            logging.error(
+                f"[{datetime.now()}] An unhandled error occurred in the "
+                f"main loop: {e}")
