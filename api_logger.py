@@ -1,11 +1,43 @@
 import argparse
 from datetime import datetime, timedelta, timezone
+import http.server
 import json
 import logging
 from pathlib import Path
 import requests
+import os
+import socketserver
 import sys
+import threading
 import time
+
+
+PORT = 8000
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+
+class MyHandler(http.server.SimpleHTTPRequestHandler):
+    """
+    A custom handler that serves files from the specified directory.
+    This is a subclass of SimpleHTTPRequestHandler.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, directory=SCRIPT_DIR, **kwargs)
+
+
+def run_server():
+    """
+    Starts a simple HTTP server in a separate thread.
+    """
+    # Use a TCP server to handle requests from the specified port
+    with socketserver.TCPServer(("", PORT), MyHandler) as httpd:
+        logging.info(f"[{datetime.now()}] Server thread started.")
+        logging.info(
+            f"[{datetime.now()}] Serving directory: "
+            f"{os.path.abspath(SCRIPT_DIR)}")
+        print(f"HTTP Server serving at http://localhost:{PORT}")
+        # serve_forever() is a blocking call, which is why we need a thread
+        httpd.serve_forever()
 
 
 def get_call(url: str, headers: dict = None):
@@ -110,6 +142,10 @@ if __name__ == '__main__':
     logging.basicConfig(level=args.log_level.upper())
     args.log_dir.mkdir(parents=True, exist_ok=True)
     api_key = ''
+
+    # Start the HTTP server in a new thread.
+    server_thread = threading.Thread(target=run_server, daemon=True)
+    server_thread.start()
 
     while True:
         try:
