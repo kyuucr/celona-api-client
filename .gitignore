@@ -2,3 +2,5 @@
 logs
 *.yaml
 *.json
+*.csv
+.~lock*
