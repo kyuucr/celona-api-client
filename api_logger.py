@@ -80,7 +80,11 @@ def batch_fetch_data(api_key, log_dir):
     output_fn = log_dir / f"{timestamp}.json"
     with open(output_fn, 'w') as f:
         f.write(json.dumps(output))
-    logging.info('Done !')
+
+    logging.info(f"[{datetime.now()}] Writing to latest.json ...")
+    with open('latest.json', 'w') as f:
+        f.write(json.dumps(output))
+    logging.info(f"[{datetime.now()}] Fetching done !")
 
 
 def parse(list_args=None):
