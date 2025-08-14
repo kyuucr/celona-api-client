@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floating Text Over Map</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Optional: set a specific height for the map container */
+        .map-container {
+            /*height: 80vh;*/
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-start p-8 font-sans">
+
+    <h1 class="text-4xl sm:text-5xl font-extrabold text-gray-900 text-center mb-8">
+        Celona ND Deployment
+    </h1>
+    <div class="text-xl text-gray-900 text-center mb-3">Heatmap taken from Celona's indoor RSRP prediction.</div>
+    <div class="text-xl text-gray-900 text-center mb-8">Data as of <span id="lastUpdate">LAST_UPDATE</span>.</div>
+
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">Fitzpatrick Basement Level</h2>
+    <div class="map-container w-full max-w-7xl relative rounded-xl shadow-md overflow-hidden border-4 border-white mb-8">
+        <!-- Background Image (the 'map') -->
+        <img src="imgs/basement.png"
+             alt="Background map"
+             class="w-full h-full object-contain">
+
+        <div id="enbHB-05" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.20 * 100%); left:calc(0.24 * 100%);">
+            <h1 class="text-sm font-bold">HB-05 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enbHB-18B" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.17 * 100%); left:calc(0.73 * 100%);">
+            <h1 class="text-sm font-bold">HB-18B [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enbHB-21" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.72 * 100%); left:calc(0.51 * 100%);">
+            <h1 class="text-sm font-bold">HB-21 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enbHB-28" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.75 * 100%); left:calc(0.13 * 100%);">
+            <h1 class="text-sm font-bold">HB-28 [<span class="mode">4G</span>]</h1>
+        </div>
+
+    </div>
+
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">Cushing 1st Floor</h2>
+    <div class="map-container w-full max-w-7xl relative rounded-xl shadow-md overflow-hidden border-4 border-white mb-8">
+        <!-- Background Image (the 'map') -->
+        <img src="imgs/f1.png"
+             alt="Background map"
+             class="w-full h-full object-contain">
+
+        <div id="enb101" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.77 * 100%); left:calc(0.67 * 100%);">
+            <h1 class="text-sm font-bold">101 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enbH106" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.11 * 100%); left:calc(0.67 * 100%);">
+            <h1 class="text-sm font-bold">H106 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enb116" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.03 * 100%); left:calc(0.41 * 100%);">
+            <h1 class="text-sm font-bold">116 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enb118C" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.03 * 100%); left:calc(0.1 * 100%);">
+            <h1 class="text-sm font-bold">118C [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enb125" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.77 * 100%); left:calc(0.14 * 100%);">
+            <h1 class="text-sm font-bold">125 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enb149" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.70 * 100%); left:calc(0.41 * 100%);">
+            <h1 class="text-sm font-bold">149 [<span class="mode">4G</span>]</h1>
+        </div>
+
+    </div>
+
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">Fitzpatrick 2nd Floor</h2>
+    <div class="map-container w-full max-w-7xl relative rounded-xl shadow-md overflow-hidden border-4 border-white mb-8">
+        <!-- Background Image (the 'map') -->
+        <img src="imgs/f2.png"
+             alt="Background map"
+             class="w-full h-full object-contain">
+
+        <div id="enb257" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.58 * 100%); left:calc(0.68 * 100%);">
+            <h1 class="text-sm font-bold">257 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enb249" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.41 * 100%); left:calc(0.39 * 100%);">
+            <h1 class="text-sm font-bold">249 [<span class="mode">4G</span>]</h1>
+        </div>
+
+        <div id="enbH275" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.65 * 100%); left:calc(0.13 * 100%);">
+            <h1 class="text-sm font-bold">H275 [<span class="mode">4G</span>]</h1>
+        </div>
+
+    </div>
+
+    <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 text-center mb-3">Outdoor Deployments</h2>
+    <div class="map-container w-full max-w-7xl relative rounded-xl shadow-md overflow-hidden border-4 border-white">
+        <!-- Background Image (the 'map') -->
+        <img src="imgs/outdoor.png"
+             alt="Background map"
+             class="w-full h-full object-contain">
+
+        <div id="enbRockne" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.45 * 100%); left:calc(0.08 * 100%);">
+            <h1 class="text-sm font-bold">Rockne [<span class="mode">5G</span>]</h1>
+        </div>
+
+        <div id="enbFitz-Cush" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.52 * 100%); left:calc(0.64 * 100%);">
+            <h1 class="text-sm font-bold">Fitz-Cush [<span class="mode">5G</span>]</h1>
+        </div>
+
+        <div id="enbLibrary" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.14 * 100%); left:calc(0.88 * 100%);">
+            <h1 class="text-sm font-bold">Library [<span class="mode">5G</span>]</h1>
+        </div>
+
+        <div id="enbLegends" class="absolute transform -translate-x-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-xl shadow-lg text-center transition-all duration-300 hover:scale-105" style="top:calc(0.87 * 100%); left:calc(0.80 * 100%);">
+            <h1 class="text-sm font-bold">Legends [<span class="mode">5G</span>]</h1>
+        </div>
+
+    </div>
+    <script type="text/javascript">
+        function appendData(enodebArr) {
+            for (const enodeb of enodebArr) {
+                const div = document.querySelector(`#enb${enodeb.name}`);
+                if (div) {
+                    const mode = div.querySelector(".mode");
+                    mode.innerHTML = enodeb.current_radio_technology_label;
+                    for (const radio of enodeb.radios) {
+                        const radioText = document.createElement("p");
+                        radioText.className = "text-xs";
+                        let bw = radio.channel_bandwidth;
+                        if (enodeb.current_radio_technology_label === "4G") {
+                            bw = bw / 5
+                        }
+                        radioText.innerHTML = `[${radio.pci}] ${radio.frequency_dl} – ${bw}`;
+                        div.appendChild(radioText);
+                    }
+                }
+            }
+        }
+
+        fetch('latest.json')
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            console.log(data)
+            const span = document.querySelector("#lastUpdate");
+            span.innerHTML = `${new Date(data.timestamp)}`
+            appendData(data.enodebs);
+        })
+        .catch(function (err) {
+            console.log('error: ' + err);
+        });
+  </script>
+</body>
+</html>
