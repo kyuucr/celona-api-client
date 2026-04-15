@@ -10,6 +10,8 @@ def read_enodebs(enodebs, timestamp):
     output = list()
 
     for enodeb in enodebs:
+        if "radios" not in enodeb or enodeb['radios'] is None:
+            continue
         for radio in enodeb['radios']:
             item = {
                 'timestamp': timestamp,
