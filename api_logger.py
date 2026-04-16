@@ -116,6 +116,30 @@ def batch_fetch_data(api_key, log_dir):
     logging.info(f"[{datetime.now()}] Writing to latest.json ...")
     with open('latest.json', 'w') as f:
         f.write(json.dumps(output))
+
+    output_limited = {
+        'timestamp': timestamp,
+        'enodebs': list(map(
+            lambda x: {
+                'current_radio_technology_label': x['current_radio_technology_label'],
+                'name': x['name'],
+                'neutral_host_enabled': x['neutral_host_enabled'],
+                'radios': list(map(
+                    lambda y: {
+                        'channel_bandwidth': y['channel_bandwidth'],
+                        'frequency_dl': y['frequency_dl'],
+                        'op_status': y['op_status'],
+                        'pci': y['pci']
+                    },
+                    x['radios']
+                ))
+            },
+            output['enodebs']
+        ))
+    }
+    logging.info(f"[{datetime.now()}] Writing to latest-cbrs.json ...")
+    with open('latest-cbrs.json', 'w') as f:
+        f.write(json.dumps(output_limited))
     logging.info(f"[{datetime.now()}] Fetching done !")
 
 
