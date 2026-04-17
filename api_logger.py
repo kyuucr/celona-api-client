@@ -10,6 +10,7 @@ import socketserver
 import sys
 import threading
 import time
+from git_utils import update_file
 
 
 PORT = 8000
@@ -83,7 +84,7 @@ def get_call(url: str, headers: dict = None):
     return None
 
 
-def batch_fetch_data(api_key, log_dir):
+def batch_fetch_data(api_key, git_settings, log_dir):
     base_url = 'https://api.celona.io/v1/api/'
     headers = {
         'Accept': 'application/json',
@@ -117,29 +118,38 @@ def batch_fetch_data(api_key, log_dir):
     with open('latest.json', 'w') as f:
         f.write(json.dumps(output))
 
-    output_limited = {
-        'timestamp': timestamp,
-        'enodebs': list(map(
-            lambda x: {
-                'current_radio_technology_label': x['current_radio_technology_label'],
-                'name': x['name'],
-                'neutral_host_enabled': x['neutral_host_enabled'],
-                'radios': list(map(
-                    lambda y: {
-                        'channel_bandwidth': y['channel_bandwidth'],
-                        'frequency_dl': y['frequency_dl'],
-                        'op_status': y['op_status'],
-                        'pci': y['pci']
-                    },
-                    x['radios']
-                ))
-            },
-            output['enodebs']
-        ))
-    }
-    logging.info(f"[{datetime.now()}] Writing to latest-cbrs.json ...")
-    with open('latest-cbrs.json', 'w') as f:
-        f.write(json.dumps(output_limited))
+    if (git_settings):
+        output_limited = {
+            'timestamp': timestamp,
+            'enodebs': list(map(
+                lambda x: {
+                    'current_radio_technology_label': x['current_radio_technology_label'],
+                    'name': x['name'],
+                    'neutral_host_enabled': x['neutral_host_enabled'],
+                    'radios': list(map(
+                        lambda y: {
+                            'channel_bandwidth': y['channel_bandwidth'],
+                            'frequency_dl': y['frequency_dl'],
+                            'op_status': y['op_status'],
+                            'pci': y['pci']
+                        },
+                        x['radios']
+                    ))
+                },
+                output['enodebs']
+            ))
+        }
+        logging.info(f"[{datetime.now()}] Push latest-cbrs.json to git ...")
+        push_result = update_file(
+            repo_ssh_url=git_settings['repo'],
+            local_dir=git_settings['local_dir'],
+            file_relative_path="latest-cbrs.json",
+            new_content=json.dumps(output_limited),
+            ssh_key_content=git_settings['key'],
+            commit_message="Update latest-cbrs.json through celona-api-client."
+        )
+        logging.info(f"[{datetime.now()}] Push {'success' if push_result else 'failed'} !")
+
     logging.info(f"[{datetime.now()}] Fetching done !")
 
 
@@ -150,6 +160,8 @@ def parse(list_args=None):
                               "default=60"))
     parser.add_argument("-s", "--api-key", type=Path, default=Path("./.secret"),
                         help="Specify api key file, default='./.secret'")
+    parser.add_argument("-g", "--git-settings", type=Path, default=Path("./.git.json"),
+                        help="Specify git settings, default='./.git.json'")
     parser.add_argument("-d", "--log-dir", type=Path, default=Path("./logs"),
                         help="Specify local log directory, default='./logs'")
     parser.add_argument("-l", "--log-level", default="warning",
@@ -166,6 +178,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=args.log_level.upper())
     args.log_dir.mkdir(parents=True, exist_ok=True)
     api_key = ''
+    git_settings = {}
 
     # Start the HTTP server in a new thread.
     server_thread = threading.Thread(target=run_server, daemon=True)
@@ -175,7 +188,10 @@ if __name__ == '__main__':
         try:
             with open(args.api_key, 'r') as f:
                 api_key = f.read()
-            batch_fetch_data(api_key, args.log_dir)
+            if os.path.exists(args.git_settings):
+                with open(args.git_settings, 'r') as f:
+                    git_settings = json.load(f)
+            batch_fetch_data(api_key, git_settings, args.log_dir)
             dt_target = (datetime.now(timezone.utc).astimezone() + timedelta(
                 0, args.interval)).isoformat()
             logging.info(
@@ -185,10 +201,10 @@ if __name__ == '__main__':
         except KeyboardInterrupt:
             print("\nScript interrupted by user (Ctrl+C). Exiting.")
             break
-        except FileNotFoundError:
+        except FileNotFoundError as e:
             logging.error(
                 f"[{datetime.now()}] Please define API key in the "
-                f"{args.api_key.name} file !")
+                f"{e.filename} file !")
         except Exception as e:
             logging.error(
                 f"[{datetime.now()}] An unhandled error occurred in the "

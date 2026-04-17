@@ -1,5 +1,9 @@
 .secret
-logs
+.github.json
+tmp*/
+id_*
+logs/
+__pycache__/
 *.yaml
 *.json
 *.csv
