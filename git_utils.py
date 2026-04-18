@@ -18,8 +18,11 @@ def update_file(
     """
     # Create a temporary file to hold the private key content securely
     # delete=False ensures we control exactly when it gets deleted
-    with tempfile.NamedTemporaryFile(mode='w', delete=False, encoding='utf-8') as temp_key_file:
-        temp_key_file.write(ssh_key_content)
+    clean_key_content = ssh_key_content.replace('\r\n', '\n')
+    if not clean_key_content.endswith('\n'):
+        clean_key_content += '\n'
+    with tempfile.NamedTemporaryFile(mode='wb', delete=False) as temp_key_file:
+        temp_key_file.write(clean_key_content.encode('utf-8'))
         temp_key_path = temp_key_file.name
 
     try:
